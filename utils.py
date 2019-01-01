@@ -5,8 +5,8 @@ def read_file(topics, fname = "data/develop.txt"):
 
 	"""
 	return: data, a list of tuples (text, categories).
-		data[i] contain the info of the ith article: 
-		its text (as a string) and its categories (a string).
+		data[i] contain the info of the ith article:
+		its text (as a string) and its topics (a list of strings).
 	"""
 	
 	with open(fname, "r") as f:
@@ -85,7 +85,7 @@ def collect_n_tk(data, voc):
 
 	
 	
-def classify(W_t_i, data):
+def write_classifications(W_t_i, data):
 
 	num_articles, num_clusts = W_t_i.shape
 	clust_to_topics = defaultdict(list)

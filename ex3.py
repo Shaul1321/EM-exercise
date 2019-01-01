@@ -8,4 +8,4 @@ if __name__ == "__main__":
 	voc = utils.collect_vocab(data)
 	ntk = utils.collect_n_tk(data, voc)
 	W_t_i, likelihoods = EM.EM(data, voc, ntk, smoothing_const = 1e-2, epsilon = 1e-3, minimal_change = 1e-3)
-	utils.classify(W_t_i, data)
+	utils.write_classifications(W_t_i, data)
