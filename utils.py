@@ -67,6 +67,8 @@ def collect_n_tk(data, voc):
 	word_to_index = {w:i for (i,w) in enumerate(voc)}
 	
 	n_tk = np.zeros((len(data), len(voc)))
+
+	num_of_words = 0
 	
 	for t, article in enumerate(data):
 	
@@ -80,35 +82,73 @@ def collect_n_tk(data, voc):
 			
 			if k:
 				n_tk[t, k] += 1
-			
-	return n_tk
+				num_of_words += 1
 
-	
+	print("num of words {}".format(num_of_words))
+			
+	return n_tk, num_of_words
+
 	
 def write_classifications(W_t_i, data):
 
 	num_articles, num_clusts = W_t_i.shape
 	clust_to_topics = defaultdict(list)
+	correct = 0
+	incorrect = 0
+	
+	# assign the max topic to the cluster
+	topic_to_cluster = {}
+	clustList = []
+	clustSize = {k: 0 for k in range(0, 9)}
 	
 	with open("clust.pred", "w") as f:
 	
 		for t in range(num_articles):
 		
 			clust = np.argmax(W_t_i[t])
+			clustList.append(clust)
 			f.write(str(clust) + "\n")
 			_, topics = data[t]
 			clust_to_topics[clust].extend(topics)
-	
+			clustSize[clust] += 1
+			
 	for (k,v) in clust_to_topics.items():
 
 		topics_counter = Counter(v)
 		topics =  topics_counter.items()
 		topics_by_freq = sorted(topics, key = lambda (k,v): -v)
+
 		topics_as_str = " ".join([topic + " : " + str(count) for (topic, count) in topics_by_freq])
 		print
 		print ("cluster: {}; topics: {}".format(str(k), topics_as_str))
 		print
 		print ("=======================================================")
+
+		topic_to_cluster[k] = topics_by_freq[0][0]
+	
+	print 
+	# calculate the accuracy
+	for t in range(num_articles):
+		_, topics = data[t]
+		repTopic = topic_to_cluster[clustList[t]] # topic that represent the cluster
+
+		if (repTopic in topics):
+			correct += 1
+		else:
+			incorrect += 1
+
+	acc = (100. * correct) / (correct + incorrect)
+	print ("model accuracy is {}".format(acc))
+
+	print
+	print ("clusters size:")
+	total = 0
+	for c in clustSize:
+		print("{} : {}".format(c, clustSize[c]))
+
+		total += clustSize[c]
+
+	print("\ntotal {}".format(total))
 	
 	
 	

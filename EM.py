@@ -13,7 +13,9 @@ def calcualte_likelihood(z, k):
 	diff = np.where(diff < np.e ** (-k), 0, diff)
 
 	return np.sum(m + np.log(np.sum(diff, axis = 1)))
-	
+
+def calculate_perplexity(x, n):
+	return np.e ** (-(1. / n) * x)
 	
 def EM_init(data, voc, ntk, smoothing_const):
 
@@ -28,9 +30,9 @@ def EM_init(data, voc, ntk, smoothing_const):
 	
 	P_ik = np.zeros((9, len(voc)))
 	P_ik.fill(smoothing_const)
-	
+
 	for j, article in enumerate(data):
-	
+
 		cluster = j % 9
 		P_ik[cluster] += ntk[j]
 		
@@ -41,7 +43,7 @@ def EM_init(data, voc, ntk, smoothing_const):
 	return alpha, P_ik
 
 	
-def EM(data, voc, ntk, smoothing_const = 1e-3, k = 10, epsilon = 1e-3, minimal_change = 1e-3):
+def EM(data, voc, ntk, num_of_words, smoothing_const = 1e-3, k = 10, epsilon = 1e-3, minimal_change = 1e-3):
 
 	"""
 	perform EM iterations until convergence.
@@ -100,8 +102,11 @@ def EM(data, voc, ntk, smoothing_const = 1e-3, k = 10, epsilon = 1e-3, minimal_c
 		P_ik = unnormalized_P_ik / unnormalized_P_ik.sum(axis = 1, keepdims = True)
 		
 		likelihood, prev_likelihood = new_likelihood, likelihood
-		print (likelihood)
+		perplexity = calculate_perplexity(likelihood, num_of_words)
+
+		print ("#{} {} {}".format(counter, likelihood, perplexity))
 		likelihoods.append(likelihood)
-		
+
 	return W_ti, likelihoods
+
 
