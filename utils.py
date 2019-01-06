@@ -14,21 +14,25 @@ def read_file(topics, fname = "data/develop.txt"):
 		lines = f.readlines()
 		
 	lines = filter(lambda line: len(line) > 0, lines)
+	
 	data = []
+	texts_list, topics_list = [], []
+
 	
 	for i, line in enumerate(lines):
 		
 		if i % 2 == 0:
-				if i > 0:
-					data.append((text, article_topics))
 					
 				_, _, article_topics = line.strip().split("\t", 2)
 				article_topics = [t for t in topics if t in article_topics]
-
+				topics_list.append(article_topics)
 
 		else:
 			text = line.strip()
+			texts_list.append(text)
 	
+	assert len(texts_list) == len(topics_list)
+	data = zip(texts_list, topics_list)
 	return data
 	
 def load_topics(fname = "data/topics.txt"):
